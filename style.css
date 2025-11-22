@@ -1,74 +1,68 @@
 /* style.css */
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: #ffe6f0; /* soft pink background */
+  background: #ffeef7; /* soft light pink */
   color: #4a2c2a;
   margin: 0;
   padding: 0;
 }
 
 header {
-  background: #ff4d88; /* bright pink header */
-  color: white;
-  padding: 25px;
+  background: white; /* white banner */
+  color: #ff4d88;    /* romantic pink text */
+  padding: 30px;
   text-align: center;
-  font-size: 28px;
-  position: relative;
+  font-size: 32px;
+  letter-spacing: 2px;
+  border-bottom: 3px solid #ff99cc;
 }
 
 header::after {
-  content: "💖🌸💖";
+  content: "💖 🌸 💖";
   display: block;
   font-size: 22px;
   margin-top: 8px;
 }
 
 .card {
-  background: white;
-  border: 2px solid #ff99cc;
+  background: white; /* white boxes */
+  border: 1px solid #ff99cc;
   border-radius: 15px;
-  padding: 20px;
-  margin: 20px;
-  box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+  padding: 25px;
+  margin: 25px auto;
+  max-width: 600px;
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2);
 }
 
 button {
   background: #ff66b2;
   border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
   color: white;
   cursor: pointer;
   font-weight: bold;
+  transition: 0.3s;
 }
 
 button:hover {
   background: #e0559c;
+  transform: scale(1.05);
 }
 
 input, textarea, select {
   border: 1px solid #ff99cc;
-  border-radius: 8px;
-  padding: 10px;
-  margin-top: 6px;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 8px;
   width: 100%;
 }
 
-.badge {
-  display: inline-block;
-  background: #ffb6c1;
-  color: #4a2c2a;
-  padding: 4px 8px;
-  border-radius: 999px;
-  margin: 2px;
-  font-size: 12px;
-}
-
 .chat {
-  background: #fff0f5;
+  background: white; /* white chat box */
   border: 1px solid #ff99cc;
-  border-radius: 10px;
-  padding: 12px;
+  border-radius: 15px;
+  padding: 15px;
   height: 250px;
   overflow-y: auto;
 }
@@ -76,25 +70,27 @@ input, textarea, select {
 .bubble.me {
   background: #ff66b2;
   color: white;
-  border-radius: 12px;
-  padding: 8px;
-  margin: 6px 0;
+  border-radius: 15px 15px 0 15px;
+  padding: 10px;
+  margin: 8px 0;
   max-width: 70%;
   margin-left: auto;
 }
 
 .bubble.you {
-  background: #ffe6f0;
+  background: #ffeef7;
   border: 1px solid #ff99cc;
-  border-radius: 12px;
-  padding: 8px;
-  marginA: 6px 0;
+  border-radius: 15px 15px 15px 0;
+  padding: 10px;
+  margin: 8px 0;
   max-width: 70%;
 }
 
 footer {
   text-align: center;
-  padding: 15px;
+  padding: 20px;
+  background: white; /* white footer */
   color: #ff4d88;
   font-size: 14px;
+  border-top: 2px solid #ff99cc;
 }
