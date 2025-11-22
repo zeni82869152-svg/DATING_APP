@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HeartLink — Simple Dating App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f1220;
+      --card: #181b2e;
+      --muted: #aab1c5;
+      --text: #e7eaf6;
+      --accent: #ff4d6d;
+      --accent-2: #6bc1ff;
+      --ok: #43d787;
+      --warn: #ffb86b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text);
+      display: grid; place-items: start center; min-height: 100vh; padding: 24px;
+    }
+    header { width: 100%; max-width: 980px; margin-bottom: 16px; }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: var(--muted); }
+    .app {
+      width: 100%; max-width: 980px; display: grid; grid-template-columns: 280px 1fr;
+      gap: 16px;
+    }
+    .card {
+      background: var(--card); border: 1px solid #272b45; border-radius: 12px; padding: 16px;
+    }
+    .stack > * + * { margin-top: 12px; }
+    .row { display: flex; gap: 8px; align-items: center; }
+    input, select, textarea {
+      width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #313659; background: #0e1122; color: var(--text);
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    button {
+      background: var(--accent); border: none; color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer;
+    }
+    button.secondary { background: #2d3257; color: var(--text); }
+    button.ghost { background: transparent; border: 1px solid #313659; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .tab { padding: 8px 12px; border-radius: 999px; border: 1px solid #313659; cursor: pointer; color: var(--muted); }
+    .tab.active { background: var(--accent-2); border-color: var(--accent-2); color: #0f1220; }
+    .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+    .item { background: #12152a; border: 1px solid #2b3158; border-radius: 10px; padding: 12px; }
+    .item h4 { margin: 0 0 4px; }
+    .badge { display: inline-block; padding: 4px 8px; border: 1px solid #2b3158; border-radius: 999px; color: var(--muted); margin: 2px 4px 0 0; }
+    .muted { color: var(--muted); }
+    .divider { border-top: 1px solid #2b3158; margin: 12px 0; }
+    .chat {
+      height: 260px; overflow: auto; background: #0e1122; border: 1px solid #313659; border-radius: 8px; padding: 10px;
+    }
+    .bubble { max-width: 70%; margin: 6px 0; padding: 8px 10px; border-radius: 10px; }
+    .me { background: #2d3257; margin-left: auto; }
+    .you { background: #21264a; }
+    .status { font-size: 12px; color: var(--muted); }
+    .footer { display: flex; gap: 8px; margin-top: 8px; }
+    .danger { color: #ff6b6b; }
+    .success { color: var(--ok); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 900px) { .app { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HeartLink</h1>
+    <p class="muted">A simple demo dating app — register, create a profile, find matches, and chat. All data is stored locally.</p>
+  </header>
+
+  <div class="app">
+    <!-- Left column: auth & profile -->
+    <div class="card stack" id="leftCol">
+      <div id="auth">
+        <div class="tabs">
+          <div class="tab active" data-tab="login">Login</div>
+          <div class="tab" data-tab="register">Register</div>
+        </div>
+        <div id="loginForm" class="stack">
+          <div class="status" id="loginStatus"></div>
+          <input id="loginEmail" type="email" placeholder="Email" />
+          <input id="loginPass" type="password" placeholder="Password" />
+          <button id="loginBtn">Login</button>
+        </div>
+        <div id="registerForm" class="stack" style="display:none;">
+          <div class="status" id="regStatus"></div>
+          <input id="regName" type="text" placeholder="Name" />
+          <input id="regAge" type="number" min="18" placeholder="Age" />
+          <input id="regEmail" type="email" placeholder="Email" />
+          <input id="regPass" type="password" placeholder="Password" />
+          <div class="grid-2">
+            <select id="regGender">
+              <option value="">Gender</option>
+              <option>Female</option>
+              <option>Male</option>
+              <option>Non-binary</option>
+              <option>Prefer not to say</option>
+            </select>
+            <select id="regLookingFor">
+              <option value="">Looking for</option>
+              <option>Female</option>
+              <option>Male</option>
+              <option>Any</option>
+            </select>
+          </div>
+          <textarea id="regBio" placeholder="Short bio"></textarea>
+          <input id="regInterests" type="text" placeholder="Interests (comma separated, e.g. hiking, cooking, jazz)" />
+          <button id="registerBtn">Create account</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div id="profile" style="display:none;">
+        <h3>Your profile</h3>
+        <div class="status" id="profileStatus"></div>
+        <input id="pName" type="text" placeholder="Name" />
+        <div class="grid-2">
+          <input id="pAge" type="number" min="18" placeholder="Age" />
+          <select id="pGender">
+            <option>Female</option>
+            <option>Male</option>
+            <option>Non-binary</option>
+            <option>Prefer not to say</option>
+          </select>
+        </div>
+        <select id="pLookingFor">
+          <option>Female</option>
+          <option>Male</option>
+          <option>Any</option>
+        </select>
+        <textarea id="pBio" placeholder="Short bio"></textarea>
+        <input id="pInterests" type="text" placeholder="Interests (comma separated)" />
+        <button id="saveProfileBtn">Save profile</button>
+        <button id="logoutBtn" class="secondary">Logout</button>
+        <p class="status">Tip: Keep interests concise (e.g., “walking, baking, movies”). Matches are suggested by shared interests.</p>
+      </div>
+    </div>
+
+    <!-- Right column: matches & chat -->
+    <div class="card stack" id="rightCol">
+      <div id="matchesSection" style="display:none;">
+        <div class="tabs">
+          <div class="tab active" data-tab="suggested">Suggested</div>
+          <div class="tab" data-tab="liked">Liked</div>
+          <div class="tab" data-tab="messages">Messages</div>
+        </div>
+
+        <div id="suggestedTab">
+          <div class="status">We suggest profiles with overlapping interests and your preference.</div>
+          <div class="list" id="suggestedList"></div>
+        </div>
+
+        <div id="likedTab" style="display:none;">
+          <div class="status">Profiles you liked. If they like you back, it becomes a match.</div>
+          <div class="list" id="likedList"></div>
+        </div>
+
+        <div id="messagesTab" style="display:none;">
+          <div class="row">
+            <select id="chatSelect"></select>
+            <button id="newChatBtn" class="ghost">Start chat</button>
+          </div>
+          <div class="chat" id="chatBox"></div>
+          <div class="footer">
+            <input id="chatInput" type="text" placeholder="Type a message..." />
+            <button id="sendBtn">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Storage helpers ---
+    const db = {
+      getUsers: () => JSON.parse(localStorage.getItem('users') || '[]'),
+      setUsers: (u) => localStorage.setItem('users', JSON.stringify(u)),
+      getCurrent: () => JSON.parse(localStorage.getItem('currentUser') || 'null'),
+      setCurrent: (u) => localStorage.setItem('currentUser', JSON.stringify(u)),
+      getChats: () => JSON.parse(localStorage.getItem('chats') || '{}'),
+      setChats: (c) => localStorage.setItem('chats', JSON.stringify(c)),
+    };
+
+    const byEmail = (email) => db.getUsers().find(u => u.email === email);
+
+    // --- Tabs ---
+    document.querySelectorAll('#auth .tab').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('#auth .tab').forEach(el => el.classList.remove('active'));
+        t.classList.add('active');
+        const tab = t.dataset.tab;
+        document.getElementById('loginForm').style.display = tab === 'login' ? '' : 'none';
+        document.getElementById('registerForm').style.display = tab === 'register' ? '' : 'none';
+      });
+    });
+    document.querySelectorAll('#matchesSection .tab').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('#matchesSection .tab').forEach(el => el.classList.remove('active'));
+        t.classList.add('active');
+        const tab = t.dataset.tab;
+        document.getElementById('suggestedTab').style.display = tab === 'suggested' ? '' : 'none';
+        document.getElementById('likedTab').style.display = tab === 'liked' ? '' : 'none';
+        document.getElementById('messagesTab').style.display = tab === 'messages' ? '' : 'none';
+      });
+    });
+
+    // --- Auth ---
+    const loginStatus = document.getElementById('loginStatus');
+    const regStatus = document.getElementById('regStatus');
+
+    document.getElementById('registerBtn').addEventListener('click', () => {
+      const name = document.getElementById('regName').value.trim();
+      const age = parseInt(document.getElementById('regAge').value, 10);
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('regPass').value;
+      const gender = document.getElementById('regGender').value;
+      const lookingFor = document.getElementById('regLookingFor').value || 'Any';
+      const bio = document.getElementById('regBio').value.trim();
+      const interests = document.getElementById('regInterests').value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+
+      if (!name || !email || !pass || !age || age < 18) {
+        regStatus.textContent = 'Please fill all required fields (age must be 18+).';
+        regStatus.className = 'status danger';
+        return;
+      }
+      if (byEmail(email)) {
+        regStatus.textContent = 'Email already registered. Try logging in.';
+        regStatus.className = 'status warn';
+        return;
+      }
+      const users = db.getUsers();
+      users.push({ id: crypto.randomUUID(), name, age, email, pass, gender, lookingFor, bio, interests, likes: [], likedBy: [] });
+      db.setUsers(users);
+      regStatus.textContent = 'Account created. You can log in now.';
+      regStatus.className = 'status success';
+      document.querySelector('[data-tab="login"]').click();
+    });
+
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('loginPass').value;
+      const user = byEmail(email);
+      if (!user || user.pass !== pass) {
+        loginStatus.textContent = 'Invalid email or password.';
+        loginStatus.className = 'status danger';
+        return;
+      }
+      db.setCurrent(user);
+      loginStatus.textContent = 'Logged in.';
+      loginStatus.className = 'status success';
+      showAppForUser(user);
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      db.setCurrent(null);
+      document.getElementById('profile').style.display = 'none';
+      document.getElementById('matchesSection').style.display = 'none';
+      document.getElementById('auth').style.display = '';
+    });
+
+    // --- Profile ---
+    document.getElementById('saveProfileBtn').addEventListener('click', () => {
+      const current = db.getCurrent();
+      if (!current) return;
+      current.name = document.getElementById('pName').value.trim() || current.name;
+      current.age = parseInt(document.getElementById('pAge').value, 10) || current.age;
+      current.gender = document.getElementById('pGender').value || current.gender;
+      current.lookingFor = document.getElementById('pLookingFor').value || current.lookingFor;
+      current.bio = document.getElementById('pBio').value.trim();
+      current.interests = document.getElementById('pInterests').value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+      const users = db.getUsers().map(u => u.email === current.email ? current : u);
+      db.setUsers(users);
+      db.setCurrent(current);
+      document.getElementById('profileStatus').textContent = 'Profile updated.';
+      document.getElementById('profileStatus').className = 'status success';
+      refreshSuggestions();
+    });
+
+    function showAppForUser(user) {
+      // Fill profile form
+      document.getElementById('pName').value = user.name || '';
+      document.getElementById('pAge').value = user.age || '';
+      document.getElementById('pGender').value = user.gender || 'Prefer not to say';
+      document.getElementById('pLookingFor').value = user.lookingFor || 'Any';
+      document.getElementById('pBio').value = user.bio || '';
+      document.getElementById('pInterests').value = (user.interests || []).join(', ');
+
+      document.getElementById('auth').style.display = 'none';
+      document.getElementById('profile').style.display = '';
+      document.getElementById('matchesSection').style.display = '';
+      refreshSuggestions();
+      refreshLiked();
+      refreshChats();
+    }
+
+    // --- Matching ---
+    function overlap(a, b) {
+      const setB = new Set(b);
+      return a.filter(x => setB.has(x));
+    }
+    function refreshSuggestions() {
+      const current = db.getCurrent();
+      if (!current) return;
+      const users = db.getUsers().filter(u => u.email !== current.email);
+
+      const filtered = users.filter(u => {
+        if (current.lookingFor !== 'Any' && u.gender && u.gender !== current.lookingFor) return false;
+        // simple interest overlap
+        const shared = overlap(current.interests || [], u.interests || []);
+        u._sharedInterests = shared;
+        return shared.length > 0;
+      }).sort((a, b) => b._sharedInterests.length - a._sharedInterests.length);
+
+      const container = document.getElementById('suggestedList');
+      container.innerHTML = '';
+      if (!filtered.length) {
+        container.innerHTML = '<p class="muted">No suggestions yet. Try adding more interests.</p>';
+        return;
+      }
+      filtered.forEach(u => {
+        const el = document.createElement('div');
+        el.className = 'item';
+        el.innerHTML = `
+          <h4>${u.name}, ${u.age}</h4>
+          <div class="muted">${u.bio || 'No bio provided.'}</div>
+          <div style="margin-top:8px;">
+            ${(u._sharedInterests || []).map(i => `<span class="badge">${i}</span>`).join('')}
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <button class="secondary likeBtn">Like</button>
+            <button class="ghost chatBtn">Message</button>
+          </div>
+        `;
+        el.querySelector('.likeBtn').addEventListener('click', () => likeUser(current, u));
+        el.querySelector('.chatBtn').addEventListener('click', () => openChatWith(u));
+        container.appendChild(el);
+      });
+    }
+
+    function likeUser(me, other) {
+      const users = db.getUsers();
+      const meIdx = users.findIndex(u => u.email === me.email);
+      const otherIdx = users.findIndex(u => u.email === other.email);
+      if (!users[meIdx].likes.includes(other.email)) users[meIdx].likes.push(other.email);
+      if (!users[otherIdx].likedBy.includes(me.email)) users[otherIdx].likedBy.push(me.email);
+      db.setUsers(users);
+      db.setCurrent(users[meIdx]);
+      refreshLiked();
+    }
+
+    function refreshLiked() {
+      const current = db.getCurrent();
+      if (!current) return;
+      const liked = (current.likes || []).map(email => byEmail(email)).filter(Boolean);
+      const container = document.getElementById('likedList');
+      container.innerHTML = '';
+      if (!liked.length) {
+        container.innerHTML = '<p class="muted">You haven’t liked anyone yet.</p>';
+        return;
+      }
+      liked.forEach(u => {
+        const isMatch = (u.likes || []).includes(current.email) && (current.likes || []).includes(u.email);
+        const el = document.createElement('div');
+        el.className = 'item';
+        el.innerHTML = `
+          <h4>${u.name}, ${u.age} ${isMatch ? '<span class="badge" style="border-color:#43d787;color:#43d787;">Match</span>' : ''}</h4>
+          <div class="muted">${u.bio || ''}</div>
+          <div class="row" style="margin-top:8px;">
+            <button class="ghost">Message</button>
+          </div>
+        `;
+        el.querySelector('button').addEventListener('click', () => openChatWith(u));
+        container.appendChild(el);
+      });
+    }
+
+    // --- Messaging ---
+    function chatKey(aEmail, bEmail) {
+      return [aEmail, bEmail].sort().join('::');
+    }
+    function openChatWith(user) {
+      const current = db.getCurrent();
+      const select = document.getElementById('chatSelect');
+      const key = chatKey(current.email, user.email);
+      let chats = db.getChats();
+      chats[key] = chats[key] || [];
+      db.setChats(chats);
+
+      // ensure in dropdown
+      const exists = Array.from(select.options).some(o => o.value === user.email);
+      if (!exists) {
+        const opt = document.createElement('option');
+        opt.value = user.email; opt.textContent = `${user.name} (${user.email})`;
+        select.appendChild(opt);
+      }
+      select.value = user.email;
+      renderChat(user.email);
+      // switch tab to messages
+      document.querySelector('#matchesSection [data-tab="messages"]').click();
+    }
+
+    function renderChat(otherEmail) {
+      const current = db.getCurrent();
+      const key = chatKey(current.email, otherEmail);
+      const chats = db.getChats();
+      const thread = chats[key] || [];
+      const box = document.getElementById('chatBox');
+      box.innerHTML = '';
+      thread.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'bubble ' + (m.from === current.email ? 'me' : 'you');
+        div.textContent = m.text;
+        box.appendChild(div);
+      });
+      box.scrollTop = box.scrollHeight;
+    }
+
+    document.getElementById('newChatBtn').addEventListener('click', () => {
+      const current = db.getCurrent();
+      const others = db.getUsers().filter(u => u.email !== current.email);
+      const pick = prompt('Enter recipient email:');
+      const target = others.find(u => u.email.toLowerCase() === (pick || '').toLowerCase());
+      if (!target) { alert('User not found.'); return; }
+      openChatWith(target);
+    });
+
+    document.getElementById('chatSelect').addEventListener('change', (e) => {
+      renderChat(e.target.value);
+    });
+
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const current = db.getCurrent();
+      const otherEmail = document.getElementById('chatSelect').value;
+      const text = document.getElementById('chatInput').value.trim();
+      if (!otherEmail) { alert('Pick a conversation first.'); return; }
+      if (!text) return;
+      const key = chatKey(current.email, otherEmail);
+      const chats = db.getChats();
+      chats[key] = chats[key] || [];
+      chats[key].push({ from: current.email, to: otherEmail, text, ts: Date.now() });
+      db.setChats(chats);
+      document.getElementById('chatInput').value = '';
+      renderChat(otherEmail);
+    });
+
+    // --- Boot ---
+    const current = db.getCurrent();
+    if (current) showAppForUser(current);
+
+    // --- Seed demo users (optional) ---
+    if (db.getUsers().length === 0) {
+      const demo = [
+        { name: 'Ava', age: 34, gender: 'Female', lookingFor: 'Male', bio: 'Coffee lover, museum wanderer.', interests: ['coffee','art','walking'] },
+        { name: 'Ben', age: 40, gender: 'Male', lookingFor: 'Female', bio: 'Weekend cyclist, cooking pasta.', interests: ['cycling','cooking','movies'] },
+        { name: 'Cai', age: 29, gender: 'Non-binary', lookingFor: 'Any', bio: 'Jazz, bookstores, quiet parks.', interests: ['jazz','books','walking'] },
+        { name: 'Dana', age: 51, gender: 'Female', lookingFor: 'Any', bio: 'Photography and baking.', interests: ['photography','baking','movies'] }
+      ];
+      const seeded = demo.map(d => ({
+        id: crypto.randomUUID(),
+        name: d.name, age: d.age, email: `${d.name.toLowerCase()}@demo.local`,
+        pass: 'demo', gender: d.gender, lookingFor: d.lookingFor, bio: d.bio,
+        interests: d.interests, likes: [], likedBy: []
+      }));
+      db.setUsers(seeded);
+    }
+  </script>
+</body>
+</html>
