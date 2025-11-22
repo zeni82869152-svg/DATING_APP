@@ -1,0 +1,100 @@
+/* style.css */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #ffe6f0; /* soft pink background */
+  color: #4a2c2a;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #ff4d88; /* bright pink header */
+  color: white;
+  padding: 25px;
+  text-align: center;
+  font-size: 28px;
+  position: relative;
+}
+
+header::after {
+  content: "💖🌸💖";
+  display: block;
+  font-size: 22px;
+  margin-top: 8px;
+}
+
+.card {
+  background: white;
+  border: 2px solid #ff99cc;
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px;
+  box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+}
+
+button {
+  background: #ff66b2;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #e0559c;
+}
+
+input, textarea, select {
+  border: 1px solid #ff99cc;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 6px;
+  width: 100%;
+}
+
+.badge {
+  display: inline-block;
+  background: #ffb6c1;
+  color: #4a2c2a;
+  padding: 4px 8px;
+  border-radius: 999px;
+  margin: 2px;
+  font-size: 12px;
+}
+
+.chat {
+  background: #fff0f5;
+  border: 1px solid #ff99cc;
+  border-radius: 10px;
+  padding: 12px;
+  height: 250px;
+  overflow-y: auto;
+}
+
+.bubble.me {
+  background: #ff66b2;
+  color: white;
+  border-radius: 12px;
+  padding: 8px;
+  margin: 6px 0;
+  max-width: 70%;
+  margin-left: auto;
+}
+
+.bubble.you {
+  background: #ffe6f0;
+  border: 1px solid #ff99cc;
+  border-radius: 12px;
+  padding: 8px;
+  margin: 6px 0;
+  max-width: 70%;
+}
+
+footer {
+  text-align: center;
+  padding: 15px;
+  color: #ff4d88;
+  font-size: 14px;
+}
